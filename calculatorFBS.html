@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор FBS фулфилмента</title>
+    <style>
+        :root {
+            --primary: #6e48aa;
+            --secondary: #9d50bb;
+            --accent: #4776e6;
+            --light: #f5f7fa;
+            --dark: #2d3436;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --error: #d63031;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark);
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
+        }
+        
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            min-width: 0; /* Предотвращает растягивание */
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: clamp(0.9rem, 1.1vw, 1rem);
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        input[type="number"]:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.2);
+        }
+        
+        .result-section {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .result, .storage-result {
+            min-width: 0; /* Предотвращает растягивание */
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .result {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .storage-result {
+            background: linear-gradient(135deg, var(--success) 0%, #55efc4 100%);
+        }
+        
+        .result h2, .storage-result h2 {
+            margin-top: 0;
+            font-weight: 600;
+            font-size: clamp(1.1rem, 1.3vw, 1.3rem);
+        }
+        
+        .total-price {
+            font-size: clamp(1.8rem, 2.5vw, 2.2rem);
+            font-weight: 700;
+            margin: 10px 0;
+            color: white;
+            word-break: break-word;
+        }
+        
+        .formula-details {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            grid-column: 1 / -1;
+        }
+        
+        .formula-details h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: clamp(1rem, 1.2vw, 1.2rem);
+        }
+        
+        .formula-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: clamp(0.9rem, 1vw, 1rem);
+        }
+        
+        .formula-item:last-child {
+            border-bottom: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #4e54c8 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: clamp(1rem, 1.1vw, 1.1rem);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            grid-column: 1 / -1;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .storage-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(0, 184, 148, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+        }
+        
+        .storage-section h3 {
+            margin-top: 0;
+            color: var(--success);
+            font-size: clamp(1rem, 1.2vw, 1.2rem);
+        }
+        
+        .disclaimer {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(253, 203, 110, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            text-align: center;
+            font-style: italic;
+            color: var(--dark);
+            grid-column: 1 / -1;
+            font-size: clamp(0.9rem, 1vw, 1rem);
+        }
+        
+        @media (max-width: 768px) {
+            .calculator {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            input[type="number"] {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Калькулятор стоимости FBS фулфилмента</h1>
+        
+        <div class="calculator">
+            <div class="input-group">
+                <label for="d">Количество дополнительных вложений (D)</label>
+                <input type="number" id="d" min="0" value="0">
+            </div>
+            
+            <div class="input-group">
+                <label for="e">Количество дополнительной маркировки (E)</label>
+                <input type="number" id="e" min="0" value="0">
+            </div>
+            
+            <div class="input-group">
+                <label for="length">Длина товара, см (a)</label>
+                <input type="number" id="length" min="0" step="0.1" value="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="width">Ширина товара, см (b)</label>
+                <input type="number" id="width" min="0" step="0.1" value="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="height">Высота товара, см (c)</label>
+                <input type="number" id="height" min="0" step="0.1" value="10">
+            </div>
+            
+            <button class="btn" onclick="calculate()">Рассчитать стоимость</button>
+            
+            <div class="result-section">
+                <div class="result" id="result">
+                    <h2>Стоимость фулфилмента</h2>
+                    <div class="total-price" id="total-price">0 ₽</div>
+                    <p>По формуле: 25 + (D × 3) + (E × 5) + 1500 × (a×b×c в мм³)</p>
+                </div>
+                
+                <div class="storage-result" id="storage-result">
+                    <h2>Стоимость хранения (1 день)</h2>
+                    <div class="total-price" id="storage-total">0 ₽</div>
+                    <p>53 ₽/м³ в день × объём × 1 день</p>
+                </div>
+            </div>
+            
+            <div class="formula-details">
+                <h3>Детализация расчётов</h3>
+                
+                <div class="formula-item">
+                    <span>Стоимость обработки товара:</span>
+                    <span>25 ₽</span>
+                </div>
+                <div class="formula-item">
+                    <span>Дополнительные вложения (D × 3):</span>
+                    <span id="d-cost">0 ₽</span>
+                </div>
+                <div class="formula-item">
+                    <span>Дополнительная маркировка (E × 5):</span>
+                    <span id="e-cost">0 ₽</span>
+                </div>
+                <div class="formula-item">
+                    <span>Стоимость доставки (1500 × объём в м³):</span>
+                    <span id="delivery-cost">0 ₽</span>
+                </div>
+                
+                <div class="storage-section">
+                    <h3>Расчёт хранения (1 день)</h3>
+                    <div class="formula-item">
+                        <span>Объём товара (a × b × c):</span>
+                        <span id="volume">0 м³</span>
+                    </div>
+                    <div class="formula-item">
+                        <span>Стоимость хранения (53 ₽/м³ в день):</span>
+                        <span id="storage-cost">0 ₽</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                Расчет произведен без учета услуг упаковки
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // Получаем значения из полей ввода
+            const d = parseFloat(document.getElementById('d').value) || 0;
+            const e = parseFloat(document.getElementById('e').value) || 0;
+            const lengthCm = parseFloat(document.getElementById('length').value) || 0;
+            const widthCm = parseFloat(document.getElementById('width').value) || 0;
+            const heightCm = parseFloat(document.getElementById('height').value) || 0;
+            
+            // Конвертируем сантиметры в метры для расчета
+            const lengthM = lengthCm / 100;
+            const widthM = widthCm / 100;
+            const heightM = heightCm / 100;
+            
+            // Рассчитываем компоненты стоимости фулфилмента
+            const processingCost = 25;
+            const dCost = d * 3;
+            const eCost = e * 5;
+            const volume = lengthM * widthM * heightM; // объем в кубических метрах
+            const deliveryCost = 1500 * volume;
+            
+            // Общая стоимость фулфилмента
+            const fulfillmentCost = processingCost + dCost + eCost + deliveryCost;
+            
+            // Рассчитываем стоимость хранения (фиксировано 1 день)
+            const storageCost = 53 * volume;
+            
+            // Обновляем интерфейс
+            document.getElementById('total-price').textContent = fulfillmentCost.toFixed(2) + ' ₽';
+            document.getElementById('storage-total').textContent = storageCost.toFixed(2) + ' ₽';
+            document.getElementById('d-cost').textContent = dCost.toFixed(2) + ' ₽';
+            document.getElementById('e-cost').textContent = eCost.toFixed(2) + ' ₽';
+            document.getElementById('delivery-cost').textContent = deliveryCost.toFixed(2) + ' ₽';
+            document.getElementById('volume').textContent = volume.toFixed(6) + ' м³';
+            document.getElementById('storage-cost').textContent = storageCost.toFixed(2) + ' ₽';
+        }
+        
+        // Рассчитать при загрузке страницы
+        window.onload = calculate;
+        
+        // Добавляем обработчики изменения для автоматического пересчёта
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+    </script>
+</body>
+</html>
